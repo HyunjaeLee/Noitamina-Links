@@ -1,13 +1,21 @@
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.LinkedHashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
-public class SmallMap {
+public class SmallMap extends Thread {
 
-    public static Map<String, String> smallMap(String url) {
+    private String url;
+    private Map<String, String> smallMap;
 
-        Map<String, String> smallMap = new LinkedHashMap<>();
+    public SmallMap(String url, Map<String, String> smallMap) {
+        this.url = url;
+        this.smallMap = smallMap;
+    }
+
+    @Override
+    public void run() {
 
         StringBuilder htmlStringBuilder = new StringBuilder();
         String htmlString;
@@ -35,7 +43,21 @@ public class SmallMap {
             smallMap.put(title.pollLast(), href.pollLast());
         }
 
-        return smallMap;
+        Set<VideoUrl> threadSet = new HashSet<>();
+        for(Map.Entry<String, String> entry : smallMap.entrySet()) {
+            VideoUrl videoUrl = new VideoUrl(entry);
+            threadSet.add(videoUrl);
+            videoUrl.start();
+        }
+
+        threadSet.forEach(t -> {
+            try {
+                t.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                //System.out.println(e.getMessage());
+            }
+        });
 
     }
 

@@ -14,8 +14,16 @@ public class BigMap {
 
         Deque<String> urlDeque = new ArrayDeque<>();
         Deque<String> titleDeque = new ArrayDeque<>();
-        Util.parse(html, "(https?://ani.today/list/)+\\d{2,}+[\\w\\d:#@%/;$()~_?\\+-=\\\\\\.&]*", 0, urlDeque );
-        Util.parse(html , "<a href=\"https?://ani.today/list/+\\d{2,}+[\\w\\d:#@%/;$()~_?\\+-=\\\\\\.&]*\">(.*?)</a>", 1, titleDeque);
+        Util.parse(
+                html
+                , "(https?://ani.today/list/)+\\d{2,}+[\\w\\d:#@%/;$()~_?\\+-=\\\\\\.&]*"
+                , 0
+                , urlDeque );
+        Util.parse(
+                html
+                , "<a href=\"https?://ani.today/list/+\\d{2,}+[\\w\\d:#@%/;$()~_?\\+-=\\\\\\.&]*\">(.*?)</a>"
+                , 1
+                , titleDeque);
 
         while(!url.isEmpty() && !titleDeque.isEmpty()) {
             bigMap.put(titleDeque.poll(), urlDeque.poll());

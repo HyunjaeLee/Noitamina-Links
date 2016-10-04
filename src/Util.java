@@ -1,5 +1,4 @@
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
@@ -9,12 +8,6 @@ import java.util.regex.Pattern;
 
 public class Util {
 
-    public static String videoUrl(String url) {
-
-        return parse(html(url), "<meta itemprop=\"contentURL\" content=\"(.*?)\">", 1);
-
-    }
-
     public static String html(String url){
 
         StringBuilder stringBuilder = new StringBuilder();
@@ -22,6 +15,8 @@ public class Util {
         try {
 
             URLConnection urlConnection = new URL(url).openConnection();
+            urlConnection.setConnectTimeout(30000);
+            urlConnection.setReadTimeout(30000);
             urlConnection.addRequestProperty("User-Agent", "Mozilla/5.0");
 
             BufferedReader bufferedReader =
@@ -34,10 +29,11 @@ public class Util {
 
             bufferedReader.close();
 
-        } catch (IOException e) {
+        } catch (Exception e) {
 
             //e.printStackTrace();
             System.out.println(e.getMessage());
+            return html(url); //re-try
 
         }
 
