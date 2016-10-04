@@ -1,4 +1,6 @@
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -6,6 +8,7 @@ import java.net.URLConnection;
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Deque;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
@@ -15,17 +18,33 @@ public class Main {
 
     public static void main(String[] args) {
 
-        bigMap().forEach((bigTitle, bigUrl) -> {
+        String file = "Noitamina.txt";
+        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file))) {
 
-            System.out.println(bigTitle);
+            for(Map.Entry<String, String> bigEntry : bigMap().entrySet()) {
 
-            smallMap(bigUrl).forEach((smallTitle, smallUrl) -> {
+                System.out.println(bigEntry.getKey());
 
-                System.out.println(smallTitle + " | " + videoUrl(smallUrl));
+                bufferedWriter.write(bigEntry.getKey());
+                bufferedWriter.newLine();
 
-            });
+                for(Map.Entry<String, String> smallEntry : smallMap(bigEntry.getValue()).entrySet()) {
 
-        });
+                    System.out.println(smallEntry.getKey() + " | " + videoUrl(smallEntry.getValue()));
+
+                    bufferedWriter.write(smallEntry.getKey() + " | " + videoUrl(smallEntry.getValue()));
+                    bufferedWriter.newLine();
+
+                }
+
+            }
+
+            bufferedWriter.close();
+
+        } catch (Exception e) {
+            //e.printStackTrace();
+            System.out.println(e.getMessage());
+        }
 
     }
 
@@ -34,7 +53,7 @@ public class Main {
         String url = "http://ani.today";
         String html = html(url);
 
-        Map<String, String> bigMap = new TreeMap<>(new AlphanumComparator());
+        Map<String, String> bigMap = new TreeMap<>();
 
         Deque<String> urlDeque = new ArrayDeque<>();
         Deque<String> titleDeque = new ArrayDeque<>();
@@ -51,7 +70,7 @@ public class Main {
 
     public static Map<String, String> smallMap(String url) {
 
-        Map<String, String> smallMap = new TreeMap<>(new AlphanumComparator());
+        Map<String, String> smallMap = new LinkedHashMap<>();
 
         StringBuilder htmlStringBuilder = new StringBuilder();
         String htmlString;
@@ -76,7 +95,7 @@ public class Main {
         parse (html, "<div class=\"board-list-item\"><a href=\"(.*?)\" title=", 1, href);
 
         while(!title.isEmpty() && !href.isEmpty()) {
-            smallMap.put(title.poll(), href.poll());
+            smallMap.put(title.pollLast(), href.pollLast());
         }
 
         return smallMap;
