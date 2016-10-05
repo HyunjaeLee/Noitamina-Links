@@ -46,7 +46,6 @@ public class SmallMap implements Runnable {
             smallMap.put(title.pollLast(), href.pollLast());
         }
 
-        //ExecutorService executorService = Executors.newCachedThreadPool();
         ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         Collection<Future> futures = new ArrayList<>();
 
