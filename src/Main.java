@@ -68,13 +68,10 @@ public class Main {
         // Output
 
         Output.print(map);
-        
-        /*
-        String htmlFile = "Noitamina.html";
-        Output.html(htmlFile, map);
         String textFile = "Noitamina.txt";
         Output.text(textFile, map);
-        */
+        String htmlFile = "Noitamina.html";
+        Output.html(htmlFile, map);
 
     }
 
