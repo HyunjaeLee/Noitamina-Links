@@ -42,16 +42,23 @@ public class SmallMap implements Runnable {
         Util.parse (html, "<span class=\"text\">(.*?)</span>", 1, title);
         Util.parse (html, "<div class=\"board-list-item\"><a href=\"(.*?)\" title=", 1, href);
 
-        while(!title.isEmpty() && !href.isEmpty()) {
-            smallMap.put(title.pollLast(), href.pollLast());
+        while(!title.isEmpty()){
+            if (!smallMap.keySet().contains(title.peekLast())) {
+                smallMap.put(title.pollLast(), href.pollLast());
+            } else {
+                title.pollLast();
+                href.pollLast();
+            }
         }
 
         ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         Collection<Future> futures = new ArrayList<>();
 
         for(Map.Entry<String, String> entry : smallMap.entrySet()) {
-            VideoUrl videoUrl = new VideoUrl(entry);
-            futures.add(executorService.submit(videoUrl));
+            if (!entry.getValue().contains("http://contrast.animoe.us/files/videos/")) {
+                VideoUrl videoUrl = new VideoUrl(entry);
+                futures.add(executorService.submit(videoUrl));
+            }
         }
 
         futures.forEach(future -> {
