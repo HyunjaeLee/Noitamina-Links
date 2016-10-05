@@ -1,9 +1,3 @@
-import java.io.BufferedWriter;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -17,34 +11,34 @@ public class Main {
 
     public static void main(String[] args) {
 
-        TreeMap<String, LinkedHashMap<String, String>> map;
+        // Deserialization
 
-        String ser = "map.ser";
+        String serializationFile = "map.ser";
+
+        Map<String, Map<String, String>> map;
 
         try {
-            FileInputStream fis = new FileInputStream(ser);
-            ObjectInputStream ois = new ObjectInputStream(fis);
-            map = (TreeMap<String, LinkedHashMap<String,String>>) ois.readObject();
-            ois.close();
-            fis.close();
+            map = (Map<String, Map<String, String>>) Serialization.read(serializationFile);
         } catch(Exception e) {
             System.out.println(e.getMessage());
             map = new TreeMap<>();
         }
+
+        // Thread Pool
 
         ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         Collection<Future> futures = new ArrayList<>();
 
         for (Map.Entry<String, String> bigEntry : BigMap.bigMap().entrySet()) {
 
-            if (map.keySet().contains(bigEntry.getKey())) {
+            if (map.keySet().contains(bigEntry.getKey())) { // if 'map' contains "series"
 
                 SmallMap smallMapThread = new SmallMap(bigEntry.getValue(), map.get(bigEntry.getKey()));
                 futures.add(executorService.submit(smallMapThread));
 
             } else {
 
-                LinkedHashMap<String, String> smallMap = new LinkedHashMap<>();
+                Map<String, String> smallMap = new LinkedHashMap<>();
                 map.put(bigEntry.getKey(), smallMap);
                 SmallMap smallMapThread = new SmallMap(bigEntry.getValue(), smallMap);
                 futures.add(executorService.submit(smallMapThread));
@@ -63,68 +57,24 @@ public class Main {
 
         executorService.shutdown();
 
+        // Serialization
+
         try {
-            FileOutputStream fos = new FileOutputStream(ser);
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(map);
-            oos.close();
-            fos.close();
+            Serialization.write(serializationFile, map);
         } catch(Exception e) {
             e.printStackTrace();
         }
 
-        //String file = "Noitamina.txt";
-        String file = "Noitamina.html";
+        // Output
 
-        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file))) {
-
-            bufferedWriter.write(
-                    "<!DOCTYPE HTML>\n" +
-                    "<html>\n" +
-                    "<head>\n" +
-                    "\t<meta charset=\"UTF-8\">\n" +
-                    "\t<title>Noitamina</title>\n" +
-                    "</head>\n" +
-                    "<body>\n"
-            );
-
-            for (Map.Entry<String, LinkedHashMap<String, String>> bigEntry : map.entrySet()) {
-
-                System.out.println(bigEntry.getKey());
-
-                bufferedWriter.write("\t<h1>" + bigEntry.getKey() + "</h1>\n");
-
-                 /* txt output
-                bufferedWriter.write(bigEntry.getKey());
-                bufferedWriter.newLine();
-                */
-
-                for (Map.Entry<String, String > smallEntry: bigEntry.getValue().entrySet()) {
-
-                    System.out.println(smallEntry.getKey() + " | " + smallEntry.getValue());
-
-                    bufferedWriter.write("\t<p><a href=\"" + smallEntry.getValue() + "\">" + smallEntry.getKey() + "</a></p>\n");
-
-                    /* txt output
-                    bufferedWriter.write(smallEntry.getKey() + " | " + smallEntry.getValue());
-                    bufferedWriter.newLine();
-                    */
-
-                }
-
-            }
-
-            bufferedWriter.write(
-                    "</body>\n" +
-                    "</html>\n"
-            );
-
-            bufferedWriter.close();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+        Output.print(map);
+        
+        /*
+        String htmlFile = "Noitamina.html";
+        Output.html(htmlFile, map);
+        String textFile = "Noitamina.txt";
+        Output.text(textFile, map);
+        */
 
     }
 
