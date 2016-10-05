@@ -15,8 +15,8 @@ public class Util {
         try {
 
             URLConnection urlConnection = new URL(url).openConnection();
-            urlConnection.setConnectTimeout(30000);
-            urlConnection.setReadTimeout(30000);
+            urlConnection.setConnectTimeout(10000);
+            urlConnection.setReadTimeout(10000);
             urlConnection.addRequestProperty("User-Agent", "Mozilla/5.0");
 
             BufferedReader bufferedReader =

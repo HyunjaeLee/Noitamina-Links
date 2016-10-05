@@ -1,10 +1,13 @@
 import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Deque;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
-public class SmallMap extends Thread {
+public class SmallMap implements Runnable {
 
     private String url;
     private Map<String, String> smallMap;
@@ -43,21 +46,24 @@ public class SmallMap extends Thread {
             smallMap.put(title.pollLast(), href.pollLast());
         }
 
-        Set<VideoUrl> threadSet = new HashSet<>();
+        //ExecutorService executorService = Executors.newCachedThreadPool();
+        ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        Collection<Future> futures = new ArrayList<>();
+
         for(Map.Entry<String, String> entry : smallMap.entrySet()) {
             VideoUrl videoUrl = new VideoUrl(entry);
-            threadSet.add(videoUrl);
-            videoUrl.start();
+            futures.add(executorService.submit(videoUrl));
         }
 
-        threadSet.forEach(t -> {
+        futures.forEach(future -> {
             try {
-                t.join();
-            } catch (InterruptedException e) {
+                future.get();
+            } catch (Exception e) {
                 e.printStackTrace();
-                //System.out.println(e.getMessage());
             }
         });
+
+        executorService.shutdown();
 
     }
 

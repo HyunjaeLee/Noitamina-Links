@@ -1,6 +1,6 @@
 import java.util.Map;
 
-public class VideoUrl extends Thread {
+public class VideoUrl implements Runnable {
 
     Map.Entry<String, String> entry;
 

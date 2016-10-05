@@ -1,10 +1,13 @@
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class Main {
 
@@ -12,39 +15,44 @@ public class Main {
 
         TreeMap<String, LinkedHashMap<String, String>> map = new TreeMap<>();
 
-        List<SmallMap> threadList = new ArrayList<>();
-        BigMap.bigMap().forEach((bigTitle, bigUrl) -> {
-            LinkedHashMap<String, String> smallMap = new LinkedHashMap<>();
-            map.put(bigTitle, smallMap);
-            SmallMap smallMapThread = new SmallMap(bigUrl, smallMap);
-            smallMapThread.setName(bigTitle);
-            threadList.add(smallMapThread);
-            smallMapThread.start();
-        });
 
         /*
         int i = 0;
-        Set<SmallMap> threadSet = new HashSet<>();
+        ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        Collection<Future> futures = new ArrayList<>();
         for (Map.Entry<String, String> bigEntry : BigMap.bigMap().entrySet()) {
             LinkedHashMap<String, String> smallMap = new LinkedHashMap<>();
             map.put(bigEntry.getKey(), smallMap);
             SmallMap smallMapThread = new SmallMap(bigEntry.getValue(), smallMap);
-            threadSet.add(smallMapThread);
-            smallMapThread.start();
+            futures.add(executorService.submit(smallMapThread));
+
             i++;
-            if(i == 5)
-                break;
+            if(i == 50) { break; }
         }
         */
 
-        threadList.forEach(t -> {
+
+        ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        Collection<Future> futures = new ArrayList<>();
+
+        BigMap.bigMap().forEach((bigTitle, bigUrl) -> {
+            LinkedHashMap<String, String> smallMap = new LinkedHashMap<>();
+            map.put(bigTitle, smallMap);
+            SmallMap smallMapThread = new SmallMap(bigUrl, smallMap);
+            futures.add(executorService.submit(smallMapThread));
+        });
+
+        futures.forEach(future -> {
             try {
-                t.join();
-            } catch (InterruptedException e) {
+                future.get();
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         });
 
+        executorService.shutdown();
+
+        //String file = "Noitamina.txt";
         String file = "Noitamina.html";
 
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file))) {
