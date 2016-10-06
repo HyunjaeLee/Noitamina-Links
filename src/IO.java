@@ -1,8 +1,57 @@
+import com.google.gson.Gson;
+
 import java.io.BufferedWriter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Map;
 
-public class Output {
+public class IO {
+
+    public static Object readObject(String file) throws IOException, ClassNotFoundException {
+
+        Object object;
+        FileInputStream fis = new FileInputStream(file);
+        ObjectInputStream ois = new ObjectInputStream(fis);
+        object = ois.readObject();
+        ois.close();
+        fis.close();
+        return object;
+
+    }
+
+    public static void writeObject(String file, Object object) throws IOException {
+
+        FileOutputStream fos = new FileOutputStream(file);
+        ObjectOutputStream oos = new ObjectOutputStream(fos);
+        oos.writeObject(object);
+        oos.close();
+        fos.close();
+
+    }
+
+    public static <T> T readJson(String file, Class<T> classOfT) throws IOException {
+
+        T t;
+        FileReader fr = new FileReader(file);
+        t = new Gson().fromJson(fr, classOfT);
+        fr.close();
+        return t;
+
+    }
+
+    public static void writeJson(String file, Map map) throws IOException {
+
+        String json = new Gson().toJson(map);
+        BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+        bw.write(json);
+        bw.close();
+
+    }
 
     public static void print(Map<String, Map<String, String>> map) {
 
@@ -15,7 +64,7 @@ public class Output {
 
     }
 
-    public static void text(String file, Map<String, Map<String, String>> map) {
+    public static void writeText(String file, Map<String, Map<String, String>> map) {
 
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file))) {
 
@@ -39,7 +88,7 @@ public class Output {
 
     }
 
-    public static void html(String file, Map<String, Map<String, String>> map) {
+    public static void writeHtml(String file, Map<String, Map<String, String>> map) {
 
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file))) {
 
