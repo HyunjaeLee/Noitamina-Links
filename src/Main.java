@@ -13,14 +13,15 @@ public class Main {
 
         // Deserialization
 
-        String serializationFile = "map.ser";
-
-        Map<String, Map<String, String>> map;
+        Map<String, Map<String, String>> map = null;
 
         try {
-            map = (Map<String, Map<String, String>>) Serialization.read(serializationFile);
+            map = Serialization.readJson("Noitamina.json", TreeMap.class);
         } catch(Exception e) {
             System.out.println(e.getMessage());
+        }
+
+        if(map == null) {
             map = new TreeMap<>();
         }
 
@@ -60,18 +61,13 @@ public class Main {
         // Serialization
 
         try {
-            Serialization.write(serializationFile, map);
+            Serialization.writeJson("Noitamina.json", map);
         } catch(Exception e) {
             e.printStackTrace();
         }
 
         // Output
-
         Output.print(map);
-        String textFile = "Noitamina.txt";
-        Output.text(textFile, map);
-        String htmlFile = "Noitamina.html";
-        Output.html(htmlFile, map);
 
     }
 
