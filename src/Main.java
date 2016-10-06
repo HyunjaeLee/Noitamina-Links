@@ -15,8 +15,10 @@ public class Main {
 
         Map<String, Map<String, String>> map = null;
 
+        String jsonFile = "Noitamina.json";
+
         try {
-            map = IO.readJson("Noitamina.json", TreeMap.class);
+            map = IO.readJson(jsonFile, TreeMap.class);
         } catch(Exception e) {
             System.out.println(e.getMessage());
         }
@@ -61,13 +63,14 @@ public class Main {
         // Serialization
 
         try {
-            IO.writeJson("Noitamina.json", map);
+            IO.writeJson(jsonFile, map);
         } catch(Exception e) {
             e.printStackTrace();
         }
 
         // Output
         IO.print(map);
+        IO.writeHtml("Noitamina.html", map);
 
     }
 

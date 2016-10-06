@@ -1,7 +1,11 @@
-import java.util.ArrayDeque;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Deque;
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -20,46 +24,43 @@ public class SmallMap implements Runnable {
     @Override
     public void run() {
 
-        StringBuilder htmlStringBuilder = new StringBuilder();
-        String htmlString;
+        Document doc = null;
+        Elements elements = new Elements();
 
         int pageCount = 1;
         while(true) {
-            htmlString = Util.html(url + "/" + pageCount);
-            if (htmlString.contains("<div class=\"board-list-item\">")) { // Check page validity
-                htmlStringBuilder.append(htmlString);
-                pageCount++;
-            } else {
+            try {
+                doc = Jsoup.connect(url + "/" + pageCount)
+                        .userAgent("Mozilla")
+                        .timeout(10000)
+                        .post();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Elements elementsTemp = doc.select("a[href*=view]");
+            if(elementsTemp.size() == 0) {
                 break;
             }
+            elements.addAll(elementsTemp);
+            pageCount++;
         }
+        Collections.reverse(elements); // Ascending Sort
 
-        String html = htmlStringBuilder.toString();
-
-        Deque<String> href = new ArrayDeque<>();
-        Deque<String> title = new ArrayDeque<>();
-
-        Util.parse (html, "<span class=\"text\">(.*?)</span>", 1, title);
-        Util.parse (html, "<div class=\"board-list-item\"><a href=\"(.*?)\" title=", 1, href);
-
-        while(!title.isEmpty()){
-            if (!smallMap.keySet().contains(title.peekLast())) {
-                smallMap.put(title.pollLast(), href.pollLast());
-            } else {
-                title.pollLast();
-                href.pollLast();
+        elements.forEach(element -> {
+            if(!smallMap.containsKey(element.attr("title"))){
+                smallMap.put(element.attr("title"), element.attr("abs:href"));
             }
-        }
+        });
 
         ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         Collection<Future> futures = new ArrayList<>();
 
-        for(Map.Entry<String, String> entry : smallMap.entrySet()) {
-            if (!entry.getValue().contains("http://contrast.animoe.us/files/videos/")) {
+        smallMap.entrySet().forEach(entry -> {
+            if (!entry.getValue().contains(".mp4")) {
                 VideoUrl videoUrl = new VideoUrl(entry);
                 futures.add(executorService.submit(videoUrl));
             }
-        }
+        });
 
         futures.forEach(future -> {
             try {
