@@ -7,11 +7,11 @@ import java.util.Map;
 
 public class BigMap {
 
+    private static final String URL = "http://ani.today/";
+
     public static Map<String, String> bigMap() {
 
-        String url = "http://ani.today/";
-
-        Document doc = IO.getConnection(url, 5);
+        Document doc = IO.getConnection(URL, 5);
         Element category = doc.select("div.category").first(); // div with class=category
         Elements elements = category.select("a[href~=list/\\d{2,}]");
 
@@ -20,6 +20,10 @@ public class BigMap {
 
         return bigMap;
 
+    }
+
+    public static String md5() {
+        return MD5.md5(IO.getConnection(URL, 1).outerHtml());
     }
 
 }
