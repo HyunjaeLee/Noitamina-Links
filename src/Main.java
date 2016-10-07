@@ -74,8 +74,8 @@ public class Main {
         }
 
         // Output
+
         IO.print(map);
-        IO.writeHtml("Noitamina.html", map);
 
     }
 

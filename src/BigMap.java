@@ -11,7 +11,7 @@ public class BigMap {
 
         String url = "http://ani.today/";
 
-        Document doc = Http.get(url, 5);
+        Document doc = IO.getConnection(url, 5);
         Element category = doc.select("div.category").first(); // div with class=category
         Elements elements = category.select("a[href~=list/\\d{2,}]");
 

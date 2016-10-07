@@ -14,7 +14,7 @@ public class VideoUrl implements Runnable {
     @Override
     public void run() {
 
-        Document doc = Http.get(entry.getValue(), 5);
+        Document doc = IO.getConnection(entry.getValue(), 5);
         Element element = doc.select("source[src]").first();
         entry.setValue(element.attr("abs:src"));
 

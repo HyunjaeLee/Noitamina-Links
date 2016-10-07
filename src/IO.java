@@ -1,4 +1,8 @@
 import com.google.gson.Gson;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
@@ -11,6 +15,30 @@ import java.io.ObjectOutputStream;
 import java.util.Map;
 
 public class IO {
+
+    private static final Logger logger = LoggerFactory.getLogger(IO.class);
+
+    public static Document getConnection(String url, int count) {
+
+        Document doc = null;
+
+        for(int i = 0; i < count; i++) {
+
+            try {
+                doc = Jsoup
+                        .connect(url)
+                        .userAgent("Mozilla")
+                        .get();
+                i = count; // break the loop
+            } catch (IOException e) {
+                logger.info(e.getMessage());
+            }
+
+        }
+
+        return doc;
+
+    }
 
     public static Object readObject(String file) throws IOException, ClassNotFoundException {
 
@@ -64,64 +92,58 @@ public class IO {
 
     }
 
-    public static void writeText(String file, Map<String, Map<String, String>> map) {
+    public static void writeText(String file, Map<String, Map<String, String>> map) throws IOException {
 
-        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file))) {
+        BufferedWriter bw = new BufferedWriter(new FileWriter(file));
 
-            for (Map.Entry<String, Map<String, String>> bigEntry : map.entrySet()) {
+        for (Map.Entry<String, Map<String, String>> bigEntry : map.entrySet()) {
 
-                bufferedWriter.write(bigEntry.getKey());
-                bufferedWriter.newLine();
+            bw.write(bigEntry.getKey());
+            bw.newLine();
 
-                for (Map.Entry<String, String > smallEntry: bigEntry.getValue().entrySet()) {
+            for (Map.Entry<String, String > smallEntry: bigEntry.getValue().entrySet()) {
 
-                    bufferedWriter.write(smallEntry.getKey() + " | " + smallEntry.getValue());
-                    bufferedWriter.newLine();
-
-                }
+                bw.write(smallEntry.getKey() + " | " + smallEntry.getValue());
+                bw.newLine();
 
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
         }
+
+        bw.close();
 
     }
 
-    public static void writeHtml(String file, Map<String, Map<String, String>> map) {
+    public static void writeHtml(String file, Map<String, Map<String, String>> map) throws IOException {
 
-        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file))) {
+        BufferedWriter bw = new BufferedWriter(new FileWriter(file));
 
-            bufferedWriter.write(
-                    "<!DOCTYPE HTML>\n" +
-                            "<html>\n" +
-                            "<head>\n" +
-                            "\t<meta charset=\"UTF-8\">\n" +
-                            "\t<title>Noitamina</title>\n" +
-                            "</head>\n" +
-                            "<body>\n"
-            );
+        bw.write(
+                "<!DOCTYPE HTML>\n" +
+                        "<html>\n" +
+                        "<head>\n" +
+                        "\t<meta charset=\"UTF-8\">\n" +
+                        "\t<title>Noitamina</title>\n" +
+                        "</head>\n" +
+                        "<body>\n"
+        );
 
-            for (Map.Entry<String, Map<String, String>> bigEntry : map.entrySet()) {
+        for (Map.Entry<String, Map<String, String>> bigEntry : map.entrySet()) {
 
-                bufferedWriter.write("\t<h1>" + bigEntry.getKey() + "</h1>\n"); // Series
+            bw.write("\t<h1>" + bigEntry.getKey() + "</h1>\n"); // Series
 
-                for (Map.Entry<String, String > smallEntry: bigEntry.getValue().entrySet()) {
-                    bufferedWriter.write("\t<p><a href=\"" + smallEntry.getValue() + "\">" + smallEntry.getKey() + "</a></p>\n"); // Episode
-                }
-
+            for (Map.Entry<String, String > smallEntry: bigEntry.getValue().entrySet()) {
+                bw.write("\t<p><a href=\"" + smallEntry.getValue() + "\">" + smallEntry.getKey() + "</a></p>\n"); // Episode
             }
 
-            bufferedWriter.write(
-                    "</body>\n" +
-                            "</html>\n"
-            );
-
-            bufferedWriter.close();
-
-        } catch (Exception e) {
-            e.printStackTrace();
         }
+
+        bw.write(
+                "</body>\n" +
+                        "</html>\n"
+        );
+
+        bw.close();
 
     }
 

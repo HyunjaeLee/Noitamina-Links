@@ -1,5 +1,7 @@
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,6 +12,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class SmallMap implements Runnable {
+
+    private static final Logger logger = LoggerFactory.getLogger(SmallMap.class);
 
     private String url;
     private Map<String, String> smallMap;
@@ -27,7 +31,7 @@ public class SmallMap implements Runnable {
 
         int pageCount = 1;
         while(true) {
-            doc = Http.get(url + "/" + pageCount, 5);
+            doc = IO.getConnection(url + "/" + pageCount, 5);
             Elements elementsTemp = doc.select("a[href*=view]");
             if(elementsTemp.size() == 0) {
                 break;
@@ -59,7 +63,7 @@ public class SmallMap implements Runnable {
             try {
                 future.get();
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(), e);
             }
         });
 
