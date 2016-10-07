@@ -28,7 +28,7 @@ public class Main {
 
         // Thread Pool
 
-        if(map.size() == 0 || !MD5.compare(BigMap.md5())) {
+        if(!MD5.read("Noitamina.md5").equals(MD5.fileToMD5("Noitamina.json")) || !MD5.read("BigMap.md5").equals(BigMap.md5()) || map.size() == 0) {
             Future.future(map);
         }
 
@@ -43,6 +43,11 @@ public class Main {
         // Output
 
         IO.print(map);
+
+        // MD5
+
+        MD5.write("Noitamina.md5", MD5.fileToMD5("Noitamina.json"));
+        MD5.write("BigMap.md5", BigMap.md5());
 
     }
 

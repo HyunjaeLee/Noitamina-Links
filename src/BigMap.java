@@ -23,7 +23,7 @@ public class BigMap {
     }
 
     public static String md5() {
-        return MD5.md5(IO.getConnection(URL, 1).outerHtml());
+        return MD5.stringToMD5(IO.getConnection(URL, 1).outerHtml());
     }
 
 }
