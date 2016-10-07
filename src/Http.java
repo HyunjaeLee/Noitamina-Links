@@ -11,23 +11,20 @@ public class Http {
 
     private static final String USER_AGENT = "Mozilla";
 
-    public static Document get(String url, int count) throws IOException {
+    public static Document get(String url, int count) {
 
         Document doc = null;
 
         for(int i = 0; i < count; i++) {
 
             try {
-                doc = Jsoup.connect(url)
+                doc = Jsoup
+                        .connect(url)
                         .userAgent(USER_AGENT)
-                        //.timeout(timeInMillis)
                         .get();
+                i = count; // break the loop
             } catch (IOException e) {
-                if(i < count) {
-                    logger.info(e.getMessage());
-                } else {
-                    throw e;
-                }
+                logger.info(e.getMessage());
             }
 
         }

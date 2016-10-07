@@ -1,7 +1,6 @@
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import java.io.IOException;
 import java.util.Map;
 
 public class VideoUrl implements Runnable {
@@ -15,12 +14,7 @@ public class VideoUrl implements Runnable {
     @Override
     public void run() {
 
-        Document doc = null;
-        try {
-            doc = Http.get(entry.getValue(), 5);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Document doc = Http.get(entry.getValue(), 5);
         Element element = doc.select("source[src]").first();
         entry.setValue(element.attr("abs:src"));
 

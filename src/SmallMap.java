@@ -1,7 +1,6 @@
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -28,11 +27,7 @@ public class SmallMap implements Runnable {
 
         int pageCount = 1;
         while(true) {
-            try {
-                doc = Http.get(url + "/" + pageCount, 5);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            doc = Http.get(url + "/" + pageCount, 5);
             Elements elementsTemp = doc.select("a[href*=view]");
             if(elementsTemp.size() == 0) {
                 break;
