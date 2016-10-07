@@ -1,4 +1,3 @@
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
@@ -18,10 +17,7 @@ public class VideoUrl implements Runnable {
 
         Document doc = null;
         try {
-            doc = Jsoup.connect(entry.getValue())
-                    .userAgent("Mozilla")
-                    .timeout(10000)
-                    .post();
+            doc = Http.get(entry.getValue(), 5);
         } catch (IOException e) {
             e.printStackTrace();
         }

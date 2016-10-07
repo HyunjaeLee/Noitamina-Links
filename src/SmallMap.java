@@ -1,4 +1,3 @@
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
@@ -30,10 +29,7 @@ public class SmallMap implements Runnable {
         int pageCount = 1;
         while(true) {
             try {
-                doc = Jsoup.connect(url + "/" + pageCount)
-                        .userAgent("Mozilla")
-                        .timeout(10000)
-                        .post();
+                doc = Http.get(url + "/" + pageCount, 5);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -62,6 +58,8 @@ public class SmallMap implements Runnable {
             }
         });
 
+        executorService.shutdown();
+
         futures.forEach(future -> {
             try {
                 future.get();
@@ -69,8 +67,6 @@ public class SmallMap implements Runnable {
                 e.printStackTrace();
             }
         });
-
-        executorService.shutdown();
 
     }
 

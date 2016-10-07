@@ -1,3 +1,6 @@
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -8,6 +11,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class Main {
+
+    private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) {
 
@@ -20,7 +25,7 @@ public class Main {
         try {
             map = IO.readJson(jsonFile, TreeMap.class);
         } catch(Exception e) {
-            System.out.println(e.getMessage());
+            logger.info(e.getMessage());
         }
 
         if(map == null) {
@@ -50,22 +55,22 @@ public class Main {
 
         }
 
+        executorService.shutdown();
+
         futures.forEach(future -> {
             try {
                 future.get();
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(), e);
             }
         });
-
-        executorService.shutdown();
 
         // Serialization
 
         try {
             IO.writeJson(jsonFile, map);
         } catch(Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
 
         // Output

@@ -1,4 +1,3 @@
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -12,17 +11,13 @@ public class BigMap {
     public static Map<String, String> bigMap() {
 
         String url = "http://ani.today/";
-        Document doc = null;
 
+        Document doc = null;
         try {
-            doc = Jsoup.connect(url)
-                    .userAgent("Mozilla")
-                    .timeout(10000)
-                    .post();
+            doc = Http.get(url, 5);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         Element category = doc.select("div.category").first(); // div with class=category
         Elements elements = category.select("a[href~=list/\\d{2,}]");
 
