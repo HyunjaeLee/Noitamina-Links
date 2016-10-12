@@ -12,8 +12,7 @@ public class BigMap {
     public static Map<String, String> bigMap() {
 
         Document doc = IO.getConnection(URL, 5);
-        Element category = doc.select("div.category").first(); // div with class=category
-        Elements elements = category.select("a[href~=list/\\d{2,}]");
+        Elements elements = doc.select("div.category a[href~=list/\\d{2,}]");
 
         Map<String, String> bigMap = new HashMap<>();
         elements.forEach(element -> bigMap.put(element.text(), element.attr("abs:href")));

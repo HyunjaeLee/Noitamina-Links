@@ -1,8 +1,14 @@
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Main {
 
@@ -35,6 +41,24 @@ public class Main {
                 map.size() == 0) {
             Future.future(map);
         }
+
+        //Download
+
+        String file  = "/Users/Hyunjae/Downloads/건어물 여동생 우마루짱/";
+        Path path = Paths.get(file);
+        if(Files.notExists(path)) {
+            try {
+                Files.createDirectories(path);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        ExecutorService executorService = Executors.newFixedThreadPool(4);
+        map.get("건어물 여동생 우마루짱").forEach((k, v) -> {
+            Download download = new Download(file + k + ".mp4", v);
+            executorService.execute(download);
+        });
 
         // Serialization
 
